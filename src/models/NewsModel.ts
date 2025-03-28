@@ -1,19 +1,19 @@
-// src/models/NewsModel.ts
 import { NewsArticle } from './types';
-import FirebaseService from '../services/FirebaseService';
+import supabase from '../supabase/config';
+import SupabaseService from '../services/SupabaseService';
 
 class NewsModel {
   private articles: NewsArticle[] = [];
   private listeners: Array<() => void> = [];
-  private firebaseSubscription: (() => void) | null = null;
+  private supabaseSubscription: (() => void) | null = null;
 
   constructor() {
-    this.initializeFirebaseSubscription();
+    this.initializeSupabaseSubscription();
   }
 
-  // Firebase 실시간 구독 설정
-  private initializeFirebaseSubscription(): void {
-    this.firebaseSubscription = FirebaseService.subscribeToNews((articles) => {
+  // Supabase 실시간 구독 설정
+  private initializeSupabaseSubscription(): void {
+    this.supabaseSubscription = SupabaseService.subscribeToNews((articles) => {
       this.articles = articles;
       this.notifyListeners();
     });
@@ -32,21 +32,61 @@ class NewsModel {
       return cachedArticle;
     }
 
-    // 캐시에 없으면 Firebase에서 직접 조회
-    const article = await FirebaseService.getNewsById(id);
-    return article || undefined;
+    // 캐시에 없으면 Supabase에서 직접 조회
+    const { data, error } = await supabase
+      .from('news_articles')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error || !data) {
+      console.error('기사 조회 오류:', error);
+      return undefined;
+    }
+
+    // Supabase 데이터를 애플리케이션 모델 형식으로 변환
+    const article: NewsArticle = {
+      id: data.id,
+      title: data.title,
+      content: data.content,
+      source: data.source,
+      url: data.url,
+      imageUrl: data.image_url,
+      publishedAt: data.published_at,
+      isRead: data.is_read,
+    };
+
+    return article;
   }
 
   // 기사 읽음 상태 변경
   public async markArticleAsRead(id: string): Promise<void> {
-    // Firebase에 읽음 상태 업데이트
-    await FirebaseService.markArticleAsRead(id);
+    // Supabase에 읽음 상태 업데이트
+    const { error } = await supabase
+      .from('news_articles')
+      .update({ is_read: true })
+      .eq('id', id);
 
-    // 로컬 상태도 업데이트 (Firebase 구독으로 자동 업데이트되지만, 즉각적인 UI 반응을 위해)
+    if (error) {
+      console.error('기사 상태 업데이트 오류:', error);
+    }
+
+    // 로컬 상태도 업데이트 (Supabase 구독으로 자동 업데이트되지만, 즉각적인 UI 반응을 위해)
     this.articles = this.articles.map((article) =>
       article.id === id ? { ...article, isRead: true } : article
     );
     this.notifyListeners();
+  }
+
+  // 기사 필터링 (키워드 기반)
+  public filterArticlesByKeyword(keyword: string): NewsArticle[] {
+    if (!keyword.trim()) return this.articles;
+
+    return this.articles.filter(
+      (article) =>
+        article.title.toLowerCase().includes(keyword.toLowerCase()) ||
+        article.content.toLowerCase().includes(keyword.toLowerCase())
+    );
   }
 
   // 변경 감지를 위한 리스너 추가
@@ -66,9 +106,9 @@ class NewsModel {
 
   // 구독 정리 (컴포넌트 unmount 시)
   public cleanup(): void {
-    if (this.firebaseSubscription) {
-      this.firebaseSubscription();
-      this.firebaseSubscription = null;
+    if (this.supabaseSubscription) {
+      this.supabaseSubscription();
+      this.supabaseSubscription = null;
     }
   }
 }

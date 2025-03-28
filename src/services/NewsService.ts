@@ -1,49 +1,52 @@
+// src/services/NewsService.ts
 import { v4 as uuidv4 } from 'uuid';
-import { NewsArticle, FilterSettings, NewsApiItem } from '../models/types';
+import { NewsArticle, FilterSettings } from '../models/types';
+import supabase from '../supabase/config';
 
 class NewsService {
-  private API_URL = '/api/news'; // API 엔드포인트 예시 (실제 구현 필요)
-
   // 산불 관련 뉴스 가져오기
   public async fetchFireNews(settings: FilterSettings): Promise<NewsArticle[]> {
     try {
-      // 실제 환경에서는 여기서 서버 API를 호출하거나 크롤링 서비스를 이용
-      // 개발 환경 예시 코드
-      const response = await fetch(this.API_URL);
+      // Supabase에서 뉴스 데이터 가져오기
+      const { data, error } = await supabase
+        .from('news_articles')
+        .select('*')
+        .order('published_at', { ascending: false })
+        .limit(50);
 
-      if (!response.ok) {
-        throw new Error('뉴스 데이터를 가져오는 데 실패했습니다.');
+      if (error) {
+        throw new Error(
+          `뉴스 데이터를 가져오는 데 실패했습니다: ${error.message}`
+        );
       }
 
-      const data = await response.json();
-      return this.processNewsData(data, settings);
-    } catch (error) {
-      console.error('뉴스 서비스 오류:', error);
+      if (!data || data.length === 0) {
+        console.warn('가져온 뉴스 데이터가 없습니다.');
+        return this.getMockData(settings); // 데이터가 없으면 샘플 데이터 반환
+      }
 
-      // 개발 중 테스트를 위한 샘플 데이터 반환
+      // Supabase 데이터를 애플리케이션 모델 형식으로 변환
+      const articles: NewsArticle[] = data.map((item) => ({
+        id: item.id,
+        title: item.title,
+        source: item.source,
+        url: item.url,
+        content: item.content,
+        imageUrl: item.image_url,
+        publishedAt: item.published_at,
+        isRead: item.is_read,
+      }));
+
+      return this.filterArticles(articles, settings);
+    } catch (error) {
+      console.error(
+        '뉴스 서비스 오류:',
+        error instanceof Error ? error.message : '알 수 없는 오류'
+      );
+
+      // 오류 발생 시 샘플 데이터 반환
       return this.getMockData(settings);
     }
-  }
-
-  // API 응답 데이터 처리
-  private processNewsData(
-    data: NewsApiItem[],
-    settings: FilterSettings
-  ): NewsArticle[] {
-    // API 응답 데이터 형식에 맞게 변환 로직 작성
-    const articles: NewsArticle[] = data.map((item) => ({
-      id: item.id || uuidv4(),
-      title: item.title,
-      source: item.source,
-      url: item.url,
-      content: item.content,
-      imageUrl: item.imageUrl,
-      publishedAt: item.publishedAt,
-      isRead: false,
-    }));
-
-    // 필터 설정에 맞게 필터링
-    return this.filterArticles(articles, settings);
   }
 
   // 설정에 따라 기사 필터링
@@ -73,7 +76,7 @@ class NewsService {
     return filteredArticles;
   }
 
-  // 개발용 샘플 데이터
+  // 개발용 샘플 데이터 (실제 데이터가 없을 때 사용)
   private getMockData(settings: FilterSettings): NewsArticle[] {
     const currentDate = new Date().toISOString();
 

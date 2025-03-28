@@ -12,9 +12,9 @@ const HomePage: React.FC = () => {
 
   return (
     <div className='container mx-auto max-w-md px-4 pb-24'>
-      <header className='sticky top-0 z-10 bg-white py-4 border-b mb-4'>
+      <header className='sticky top-0 z-10 bg-gray-200 p-4 border-b mb-4 text-gray-700'>
         <div className='flex items-center justify-between'>
-          <h1 className='text-xl font-bold'>산불 속보</h1>
+          <h1 className='text-xl font-bold'>재난 속보</h1>
           <div className='flex space-x-2'>
             <NotificationBanner />
             <Button
@@ -30,7 +30,7 @@ const HomePage: React.FC = () => {
 
       <main>
         {state.error ? (
-          <div className='rounded-md bg-red-50 p-4 my-4'>
+          <div className='rounded-md bg-red-50 p-4 my-4 text-black'>
             <div className='flex'>
               <div className='text-sm text-red-700'>
                 <p>데이터를 불러오는 중 오류가 발생했습니다.</p>

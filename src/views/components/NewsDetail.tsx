@@ -47,7 +47,7 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ article }) => {
   };
 
   return (
-    <div className='max-w-2xl mx-auto pb-16'>
+    <div className='max-w-2xl mx-auto pb-16 text-gray-700'>
       {/* 상단 버튼 */}
       <div className='sticky top-0 bg-white z-10 py-2 border-b mb-4 flex justify-between'>
         <Button variant='ghost' size='icon' onClick={() => navigate(-1)}>
@@ -80,7 +80,7 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ article }) => {
       </div>
 
       {/* 대표 이미지 */}
-      {article.imageUrl && (
+      {/* {article.imageUrl && (
         <div className='mb-6 rounded-lg overflow-hidden'>
           <img
             src={article.imageUrl}
@@ -88,7 +88,7 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ article }) => {
             className='w-full h-auto'
           />
         </div>
-      )}
+      )} */}
 
       {/* 본문 내용 */}
       <div className='prose max-w-none'>

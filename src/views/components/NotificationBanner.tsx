@@ -52,9 +52,12 @@ const NotificationBanner: React.FC = () => {
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className='w-80 p-0' align='end'>
-        <div className='flex items-center justify-between p-4 border-b'>
-          <h3 className='font-semibold'>알림</h3>
+      <PopoverContent
+        className='w-80 p-0 bg-white shadow-lg border border-gray-200'
+        align='end'
+      >
+        <div className='flex items-center justify-between p-4 border-b bg-gray-50'>
+          <h3 className='font-semibold text-gray-700'>알림</h3>
           {state.notifications.length > 0 && (
             <Button
               variant='ghost'
@@ -67,7 +70,7 @@ const NotificationBanner: React.FC = () => {
           )}
         </div>
 
-        <ScrollArea className='h-[300px]'>
+        <ScrollArea className='h-[300px] bg-white'>
           {state.notifications.length > 0 ? (
             <div className='divide-y'>
               {state.notifications.map((notification) => {
@@ -80,7 +83,7 @@ const NotificationBanner: React.FC = () => {
                   <div
                     key={notification.id}
                     className={`p-3 cursor-pointer hover:bg-gray-50 transition-colors ${
-                      !notification.isRead ? 'bg-blue-50' : ''
+                      !notification.isRead ? 'bg-blue-50' : 'bg-white'
                     }`}
                     onClick={() => onNotificationClick(notification.id)}
                   >
@@ -100,7 +103,7 @@ const NotificationBanner: React.FC = () => {
               })}
             </div>
           ) : (
-            <div className='flex items-center justify-center h-full text-gray-500'>
+            <div className='flex items-center justify-center h-full text-gray-500 bg-white'>
               새 알림이 없습니다.
             </div>
           )}

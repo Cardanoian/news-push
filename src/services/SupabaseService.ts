@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import { NewsArticle, FilterSettings } from '../models/types';
 
-const supabaseUrl = 'YOUR_SUPABASE_URL';
-const supabaseKey = 'YOUR_SUPABASE_KEY';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 class SupabaseService {
@@ -22,6 +22,17 @@ class SupabaseService {
           table: 'news_articles',
         },
         (payload) => {
+          // payload 사용하는 방법 1: 콘솔에 로깅
+          console.log('새 기사가 추가되었습니다:', payload);
+
+          // 또는 payload 사용하는 방법 2: 특정 정보 추출
+          const newArticleId = payload.new?.id;
+          console.log('새 기사 ID:', newArticleId);
+
+          // 또는 방법 3: payload 변수를 제거하고 익명 함수 사용
+          // 이 방법을 선택하면 다음과 같이 코드를 변경합니다:
+          // }, () => {
+
           // 신규 기사 추가 시 클라이언트에 알림
           this.getLatestNews().then(onNewsUpdate);
         }

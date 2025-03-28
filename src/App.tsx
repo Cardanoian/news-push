@@ -12,16 +12,18 @@ import NewsDetailPage from './views/pages/NewsDetailPage';
 
 const App: React.FC = () => {
   return (
-    <AppProvider>
-      <Router>
-        <Routes>
-          <Route path='/' element={<HomePage />} />
-          <Route path='/settings' element={<SettingsPage />} />
-          <Route path='/article/:id' element={<NewsDetailPage />} />
-          <Route path='*' element={<Navigate to='/' replace />} />
-        </Routes>
-      </Router>
-    </AppProvider>
+    <div className='min-h-screen bg-gray-400'>
+      <AppProvider>
+        <Router>
+          <Routes>
+            <Route path='/' element={<HomePage />} />
+            <Route path='/settings' element={<SettingsPage />} />
+            <Route path='/article/:id' element={<NewsDetailPage />} />
+            <Route path='*' element={<Navigate to='/' replace />} />
+          </Routes>
+        </Router>
+      </AppProvider>
+    </div>
   );
 };
 

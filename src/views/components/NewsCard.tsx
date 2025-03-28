@@ -38,27 +38,31 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, onClick }) => {
 
   return (
     <Card
-      className={`mb-4 overflow-hidden hover:shadow-md transition-shadow ${
+      className={`mb-4 overflow-hidden hover:shadow-md transition-shadow bg-gray-200 ${
         !article.isRead ? 'border-l-4 border-l-red-500' : ''
       }`}
       onClick={handleClick}
     >
-      <CardHeader className='pb-2'>
+      <CardHeader className='pb-2  text-gray-800'>
         <div className='flex justify-between items-start'>
           <CardTitle className='text-lg font-bold line-clamp-2'>
             {article.title}
           </CardTitle>
-          {!article.isRead && <Badge variant='destructive'>새 소식</Badge>}
+          {!article.isRead && (
+            <Badge className='bg-red-500 text-white hover:bg-red-300 hover:text-gray-500'>
+              New!
+            </Badge>
+          )}
         </div>
         <CardDescription className='text-sm text-gray-500'>
           {article.source} · {formattedDate}
         </CardDescription>
       </CardHeader>
 
-      <CardContent className='pb-2'>
+      <CardContent className='pb-2 bg-gray-200 '>
         <p className='text-sm text-gray-700 line-clamp-3'>{article.content}</p>
 
-        {article.imageUrl && (
+        {/* {article.imageUrl && (
           <div className='mt-2 h-32 overflow-hidden rounded-md'>
             <img
               src={article.imageUrl}
@@ -66,11 +70,11 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, onClick }) => {
               className='w-full h-full object-cover'
             />
           </div>
-        )}
+        )} */}
       </CardContent>
 
-      <CardFooter className='pt-0'>
-        <div className='flex justify-between w-full'>
+      <CardFooter className='pt-0 '>
+        <div className='flex justify-between w-full text-gray-700'>
           <Button
             variant='ghost'
             size='sm'
@@ -82,7 +86,12 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, onClick }) => {
             원문 보기
           </Button>
 
-          <Button variant='outline' size='sm' onClick={handleClick}>
+          <Button
+            variant='outline'
+            size='sm'
+            className=' text-gray-700'
+            onClick={handleClick}
+          >
             자세히 보기
           </Button>
         </div>

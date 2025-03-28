@@ -52,7 +52,7 @@ const SettingsPage: React.FC = () => {
 
   return (
     <div className='container mx-auto max-w-md px-4'>
-      <header className='sticky top-0 z-10 bg-white py-4 border-b mb-6'>
+      <header className='sticky top-0 z-10 bg-white text-gray-700 py-4 border-b mb-6'>
         <div className='flex items-center'>
           <Button
             variant='ghost'
@@ -66,7 +66,7 @@ const SettingsPage: React.FC = () => {
         </div>
       </header>
 
-      <main className='space-y-6 pb-16'>
+      <main className='space-y-6 p-4 pb-16 bg-white text-gray-700'>
         {/* 키워드 설정 */}
         <div className='space-y-3'>
           <h2 className='text-lg font-semibold'>알림 키워드</h2>
@@ -157,7 +157,7 @@ const SettingsPage: React.FC = () => {
 
         {/* 저장 버튼 */}
         <div className='pt-4'>
-          <Button className='w-full' onClick={handleSave}>
+          <Button className='w-full bg-gray-200' onClick={handleSave}>
             설정 저장
           </Button>
         </div>
