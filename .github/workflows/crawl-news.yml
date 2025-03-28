@@ -1,0 +1,15 @@
+# .github/workflows/crawl-news.yml
+name: Crawl Fire News
+
+on:
+  schedule:
+    - cron: '*/1 * * * *'  # 1분마다 실행
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Supabase Function
+        run: |
+          curl -X POST "https://aidroknrrnshfnfcxatr.functions.supabase.co/crawl-fire-news" \
+          -H "Authorization: Bearer ${{ secrets.SUPABASE_API_KEY }}"
