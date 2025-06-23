@@ -23,12 +23,27 @@ class NotificationModel {
 
   // 새 알림 추가
   public addNotification(notification: Notification): void {
-    this.notifications = [notification, ...this.notifications];
+    const readIds = JSON.parse(
+      localStorage.getItem('readNotifications') || '[]'
+    );
+    const updatedNotification = {
+      ...notification,
+      isRead: readIds.includes(notification.id),
+    };
+    this.notifications = [updatedNotification, ...this.notifications];
     this.notifyListeners();
   }
 
   // 알림 읽음 상태 변경
   public markNotificationAsRead(id: string): void {
+    // localStorage에 읽은 알림 ID 저장
+    const readIds = JSON.parse(
+      localStorage.getItem('readNotifications') || '[]'
+    );
+    if (!readIds.includes(id)) {
+      readIds.push(id);
+      localStorage.setItem('readNotifications', JSON.stringify(readIds));
+    }
     this.notifications = this.notifications.map((notification) =>
       notification.id === id ? { ...notification, isRead: true } : notification
     );

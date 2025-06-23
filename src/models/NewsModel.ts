@@ -14,7 +14,11 @@ class NewsModel {
   // Supabase 실시간 구독 설정
   private initializeSupabaseSubscription(): void {
     this.supabaseSubscription = SupabaseService.subscribeToNews((articles) => {
-      this.articles = articles;
+      const readIds = JSON.parse(localStorage.getItem('readArticles') || '[]');
+      this.articles = articles.map((article) => ({
+        ...article,
+        isRead: readIds.includes(article.id),
+      }));
       this.notifyListeners();
     });
   }
@@ -61,14 +65,11 @@ class NewsModel {
 
   // 기사 읽음 상태 변경
   public async markArticleAsRead(id: string): Promise<void> {
-    // Supabase에 읽음 상태 업데이트
-    const { error } = await supabase
-      .from('news_articles')
-      .update({ is_read: true })
-      .eq('id', id);
-
-    if (error) {
-      console.error('기사 상태 업데이트 오류:', error);
+    // localStorage에 읽은 기사 ID 저장
+    const readIds = JSON.parse(localStorage.getItem('readArticles') || '[]');
+    if (!readIds.includes(id)) {
+      readIds.push(id);
+      localStorage.setItem('readArticles', JSON.stringify(readIds));
     }
 
     // 로컬 상태도 업데이트 (Supabase 구독으로 자동 업데이트되지만, 즉각적인 UI 반응을 위해)

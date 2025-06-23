@@ -1,19 +1,26 @@
+/* @ts-expect-error: Deno 전용 import, Node.js 타입 검사 무시 */
 import { serve } from 'https://deno.land/std@0.170.0/http/server.ts';
+/* @ts-expect-error: Deno 전용 import, Node.js 타입 검사 무시 */
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+/* @ts-expect-error: Deno 전용 import, Node.js 타입 검사 무시 */
 import webpush from 'https://esm.sh/web-push@3.5.0';
 
+/* @ts-expect-error: Deno 전용 import, Node.js 타입 검사 무시 */
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
+/* @ts-expect-error: Deno 전용 import, Node.js 타입 검사 무시 */
 const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // VAPID 설정
 webpush.setVapidDetails(
   'mailto:your-email@example.com',
+  /* @ts-expect-error: Deno 전용 import, Node.js 타입 검사 무시 */
   Deno.env.get('PUBLIC_VAPID_KEY') || '',
+  /* @ts-expect-error: Deno 전용 import, Node.js 타입 검사 무시 */
   Deno.env.get('PRIVATE_VAPID_KEY') || ''
 );
 
-serve(async (req) => {
+serve(async () => {
   try {
     // 새로운 알림 확인
     const { data: newNotifications, error } = await supabase

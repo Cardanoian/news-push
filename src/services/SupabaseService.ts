@@ -1,9 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
+import supabase from '../supabase/config';
 import { NewsArticle, FilterSettings } from '../models/types';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 class SupabaseService {
   // 뉴스 기사 실시간 구독

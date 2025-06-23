@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAppContext } from '../../context/useAppContext';
-import { formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
 interface NewsCardProps {
@@ -23,10 +23,13 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, onClick }) => {
   const { markArticleAsRead } = useAppContext();
 
   // 날짜 포맷팅
-  const formattedDate = formatDistanceToNow(new Date(article.publishedAt), {
-    addSuffix: true,
-    locale: ko,
-  });
+  const formattedDate = format(
+    new Date(article.publishedAt),
+    'yy년 M월 d일 H시 mm분',
+    {
+      locale: ko,
+    }
+  );
 
   // 기사 클릭 처리
   const handleClick = () => {

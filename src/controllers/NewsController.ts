@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
+import { keywords } from '../constants/constants';
 import NewsModel from '../models/NewsModel';
 import NotificationModel from '../models/NotificationModel';
 import { NewsArticle, FilterSettings } from '../models/types';
@@ -11,7 +12,7 @@ class NewsController {
   private notificationService: NotificationService;
   private refreshInterval: NodeJS.Timeout | null = null;
   private settings: FilterSettings = {
-    keywords: ['산불', '화재', '산림'],
+    keywords,
     sources: [],
     refreshInterval: 300, // 5분(초 단위)
   };
@@ -58,7 +59,7 @@ class NewsController {
           const notification = {
             id: uuidv4(),
             articleId: article.id,
-            title: '산불 속보',
+            title: '재해 속보',
             body: article.title,
             timestamp: new Date().toISOString(),
             isRead: false,

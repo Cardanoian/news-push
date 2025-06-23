@@ -125,12 +125,30 @@ const SettingsPage: React.FC = () => {
               <SelectTrigger id='refresh-interval'>
                 <SelectValue placeholder='새로고침 주기 선택' />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='60'>1분 (60초)</SelectItem>
-                <SelectItem value='300'>5분 (300초)</SelectItem>
-                <SelectItem value='600'>10분 (600초)</SelectItem>
-                <SelectItem value='1800'>30분 (1800초)</SelectItem>
-                <SelectItem value='3600'>1시간 (3600초)</SelectItem>
+              <SelectContent className='bg-white text-black border border-gray-300 shadow-lg z-50'>
+                {[60, 120, 180, 300, 600].map((minutes: number) => (
+                  <SelectItem
+                    value={minutes.toString()}
+                    className='bg-white text-black'
+                  >
+                    {Math.trunc(minutes / 60)}분 ({minutes}초)
+                  </SelectItem>
+                ))}
+                {/* <SelectItem value='60' className='text-black'>
+                  1분 (60초)
+                </SelectItem>
+                <SelectItem value='120' className='text-black'>
+                  2분 (120초)
+                </SelectItem>
+                <SelectItem value='180' className='text-black'>
+                  3분 (180초)
+                </SelectItem>
+                <SelectItem value='300' className='text-black'>
+                  5분 (300초)
+                </SelectItem>
+                <SelectItem value='600' className='text-black'>
+                  10분 (600초)
+                </SelectItem> */}
               </SelectContent>
             </Select>
           </div>
@@ -146,9 +164,23 @@ const SettingsPage: React.FC = () => {
           <Button
             variant='outline'
             onClick={() => {
-              if (Notification.permission !== 'granted') {
-                Notification.requestPermission();
+              if (!('Notification' in window)) {
+                alert('이 브라우저는 알림을 지원하지 않습니다.');
+                return;
               }
+              Notification.requestPermission()
+                .then((permission) => {
+                  if (permission === 'granted') {
+                    alert('알림 권한이 허용되었습니다.');
+                  } else if (permission === 'denied') {
+                    alert('알림 권한이 거부되었습니다.');
+                  } else {
+                    alert('알림 권한 요청이 취소되었습니다.');
+                  }
+                })
+                .catch(() => {
+                  alert('알림 권한 요청 중 오류가 발생했습니다.');
+                });
             }}
           >
             알림 권한 설정
