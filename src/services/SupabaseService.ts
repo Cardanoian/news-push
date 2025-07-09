@@ -1,11 +1,11 @@
 import supabase from '../supabase/config';
-import { NewsArticle, FilterSettings } from '../models/types';
+import { NewsArticle } from '../models/types';
 
 class SupabaseService {
   // 뉴스 기사 실시간 구독
   public subscribeToNews(onNewsUpdate: (articles: NewsArticle[]) => void) {
     // 초기 데이터 로드
-    this.getLatestNews().then(onNewsUpdate);
+    this.getNewsArticles(0, 50).then(onNewsUpdate);
 
     // 실시간 업데이트 구독
     const subscription = supabase
@@ -30,7 +30,7 @@ class SupabaseService {
           // }, () => {
 
           // 신규 기사 추가 시 클라이언트에 알림
-          this.getLatestNews().then(onNewsUpdate);
+          this.getNewsArticles(0, 50).then(onNewsUpdate);
         }
       )
       .subscribe();
@@ -41,13 +41,16 @@ class SupabaseService {
     };
   }
 
-  // 최신 기사 가져오기
-  public async getLatestNews(): Promise<NewsArticle[]> {
+  // 뉴스 기사 가져오기 (페이지네이션 적용)
+  public async getNewsArticles(
+    offset: number,
+    limit: number
+  ): Promise<NewsArticle[]> {
     const { data, error } = await supabase
       .from('news_articles')
       .select('*')
       .order('published_at', { ascending: false })
-      .limit(50);
+      .range(offset, offset + limit - 1);
 
     if (error) {
       console.error('뉴스 데이터 가져오기 오류:', error);
@@ -63,65 +66,34 @@ class SupabaseService {
       imageUrl: item.image_url,
       publishedAt: item.published_at,
       isRead: item.is_read,
+      category: item.category,
     }));
   }
 
-  // 기사 읽음 상태 업데이트
-  public async markArticleAsRead(id: string, userId?: string): Promise<void> {
-    // 기사 상태 업데이트
-    const { error } = await supabase
-      .from('news_articles')
-      .update({ is_read: true })
-      .eq('id', id);
-
-    if (error) {
-      console.error('기사 상태 업데이트 오류:', error);
-    }
-
-    // 사용자별 읽음 상태 기록 (로그인한 경우)
-    if (userId) {
-      await supabase
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('article_id', id)
-        .eq('user_id', userId);
-    }
+  // 추가 뉴스 기사 가져오기
+  public async getMoreNewsArticles(
+    offset: number,
+    limit: number
+  ): Promise<NewsArticle[]> {
+    return this.getNewsArticles(offset, limit);
   }
 
-  // 사용자 설정 저장
-  public async saveUserSettings(
-    userId: string,
-    settings: FilterSettings
-  ): Promise<void> {
-    const { error } = await supabase.from('user_settings').upsert({
-      user_id: userId,
-      keywords: settings.keywords,
-      refresh_interval: settings.refreshInterval,
-      updated_at: new Date().toISOString(),
-    });
+  // Supabase DB에서 고유한 카테고리 가져오기
+  public async getUniqueCategories(): Promise<string[]> {
+    const { data, error } = await supabase
+      .from('keywords') // 'keywords' 테이블에서
+      .select('category'); // 'category' 컬럼 선택
 
     if (error) {
-      console.error('사용자 설정 저장 오류:', error);
+      console.error('카테고리 데이터 가져오기 오류:', error);
+      return [];
     }
-  }
 
-  // 푸시 알림 구독 등록
-  public async savePushSubscription(
-    userId: string,
-    subscription: PushSubscription
-  ): Promise<void> {
-    const { error } = await supabase.from('push_subscriptions').upsert({
-      user_id: userId,
-      endpoint: subscription.endpoint,
-      keys: JSON.stringify({
-        p256dh: subscription.toJSON().keys?.p256dh,
-        auth: subscription.toJSON().keys?.auth,
-      }),
-    });
-
-    if (error) {
-      console.error('푸시 구독 저장 오류:', error);
-    }
+    // 중복 제거 및 문자열 배열로 변환
+    const uniqueCategories = Array.from(
+      new Set(data.map((item) => item.category))
+    );
+    return uniqueCategories;
   }
 }
 

@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { NewsArticle } from '../../models/types';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Share2, ArrowLeft, ExternalLink } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../context/useAppContext';
@@ -47,68 +48,124 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ article }) => {
   };
 
   return (
-    <div className='max-w-2xl mx-auto pb-16 text-gray-700'>
-      {/* 상단 버튼 */}
-      <div className='sticky top-0 bg-white z-10 py-2 border-b mb-4 flex justify-between'>
-        <Button variant='ghost' size='icon' onClick={() => navigate(-1)}>
-          <ArrowLeft className='h-5 w-5' />
-        </Button>
+    <div className='min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50'>
+      <div className='max-w-4xl mx-auto px-4 py-8'>
+        <div className='bg-white rounded-3xl shadow-2xl overflow-hidden border-0'>
+          {/* 이미지 섹션 */}
+          {article.imageUrl && (
+            <div className='relative'>
+              <img
+                src={article.imageUrl}
+                alt={article.title}
+                className='w-full h-64 object-cover'
+              />
+              <div className='absolute inset-0 bg-gradient-to-t from-black/30 to-transparent' />
 
-        <div className='flex space-x-2'>
-          <Button variant='ghost' size='icon' onClick={handleShare}>
-            <Share2 className='h-5 w-5' />
-          </Button>
+              {/* 상단 버튼들 */}
+              <div className='absolute top-6 left-6 right-6 flex items-center justify-between'>
+                <Button
+                  variant='outline'
+                  size='icon'
+                  onClick={() => navigate(-1)}
+                  className='bg-white/80 backdrop-blur-sm rounded-full border-0 shadow-lg group'
+                >
+                  <ArrowLeft className='h-5 w-5 text-gray-800 group-hover:text-white transition-colors duration-700' />
+                </Button>
 
-          <Button
-            variant='ghost'
-            size='icon'
-            onClick={() => window.open(article.url, '_blank')}
-          >
-            <ExternalLink className='h-5 w-5' />
-          </Button>
+                <div className='flex items-center gap-2'>
+                  <Button
+                    variant='outline'
+                    size='icon'
+                    onClick={handleShare}
+                    className='bg-white/80 backdrop-blur-sm rounded-full border-0 shadow-lg group'
+                  >
+                    <Share2 className='h-5 w-5 text-gray-800 group-hover:text-white transition-colors duration-700' />
+                  </Button>
+
+                  <Button
+                    variant='outline'
+                    size='icon'
+                    onClick={() => window.open(article.url, '_blank')}
+                    className='bg-white/80 backdrop-blur-sm rounded-full border-0 shadow-lig group'
+                  >
+                    <ExternalLink className='h-5 w-5 text-gray-800 group-hover:text-white transition-colors duration-700' />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 이미지가 없는 경우의 상단 버튼 */}
+          {!article.imageUrl && (
+            <div className='sticky top-0 bg-white z-10 py-4 px-6 border-b border-gray-100 flex items-center justify-between'>
+              <Button
+                variant='outline'
+                size='icon'
+                onClick={() => navigate(-1)}
+                className='rounded-full group'
+              >
+                <ArrowLeft className='h-5 w-5 text-gray-800 group-hover:text-white transition-colors duration-500' />
+              </Button>
+
+              <div className='flex items-center gap-2'>
+                <Button
+                  variant='outline'
+                  size='icon'
+                  onClick={handleShare}
+                  className='rounded-full group'
+                >
+                  <Share2 className='h-5 w-5 text-gray-800 group-hover:text-white transition-colors duration-500' />
+                </Button>
+
+                <Button
+                  variant='outline'
+                  size='icon'
+                  onClick={() => window.open(article.url, '_blank')}
+                  className='rounded-full group'
+                >
+                  <ExternalLink className='h-5 w-5 text-gray-800 group-hover:text-white transition-colors duration-500' />
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* 콘텐츠 섹션 */}
+          <div className='p-8 bg-white'>
+            {/* 제목 및 메타 정보 */}
+            <div className='mb-6'>
+              <div className='flex items-center gap-4 mb-4'>
+                <Badge className='bg-blue-100 text-blue-800 rounded-full px-3 py-1'>
+                  {article.source}
+                </Badge>
+                <span className='text-sm text-gray-600'>{formattedDate}</span>
+              </div>
+
+              <h1 className='text-3xl font-bold mb-6 leading-tight text-gray-900'>
+                {article.title}
+              </h1>
+            </div>
+
+            {/* 본문 내용 */}
+            <div className='text-gray-800 leading-relaxed mb-8'>
+              {article.content.split('\n').map((paragraph, index) => (
+                <p key={index} className='mb-4 text-lg'>
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+
+            {/* 원문 링크 */}
+            <div className='pt-6 border-t border-gray-100'>
+              <Button
+                className='w-full rounded-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-lg shadow-blue-500/25'
+                onClick={() => window.open(article.url, '_blank')}
+              >
+                <ExternalLink className='h-4 w-4 mr-2' />
+                원문 보기
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* 제목 및 메타 정보 */}
-      <div className='mb-6'>
-        <h1 className='text-2xl font-bold mb-2'>{article.title}</h1>
-        <div className='text-sm text-gray-500 flex flex-wrap gap-2'>
-          <span>{article.source}</span>
-          <span>•</span>
-          <span>{formattedDate}</span>
-        </div>
-      </div>
-
-      {/* 대표 이미지 */}
-      {/* {article.imageUrl && (
-        <div className='mb-6 rounded-lg overflow-hidden'>
-          <img
-            src={article.imageUrl}
-            alt={article.title}
-            className='w-full h-auto'
-          />
-        </div>
-      )} */}
-
-      {/* 본문 내용 */}
-      <div className='prose max-w-none'>
-        {article.content.split('\n').map((paragraph, index) => (
-          <p key={index} className='mb-4'>
-            {paragraph}
-          </p>
-        ))}
-      </div>
-
-      {/* 원문 링크 */}
-      <div className='mt-8 pt-4 border-t'>
-        <Button
-          variant='outline'
-          className='w-full'
-          onClick={() => window.open(article.url, '_blank')}
-        >
-          <ExternalLink className='h-4 w-4 mr-2' />
-          원문 보기
-        </Button>
       </div>
     </div>
   );

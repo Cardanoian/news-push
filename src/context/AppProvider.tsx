@@ -1,9 +1,6 @@
 import { useEffect, useState, ReactNode } from 'react';
-import { FilterSettings } from '../models/types';
 import NewsModel from '../models/NewsModel';
-import NotificationModel from '../models/NotificationModel';
 import NewsController from '../controllers/NewsController';
-import NotificationController from '../controllers/NotificationController';
 import { initialState } from './AppContextTypes';
 import { AppContext } from './AppContextInstance';
 
@@ -11,9 +8,6 @@ import { AppContext } from './AppContextInstance';
 export function AppProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState(initialState);
   const [newsController] = useState<NewsController>(new NewsController());
-  const [notificationController] = useState<NotificationController>(
-    new NotificationController()
-  );
 
   // 뉴스 모델 변경사항 감지 및 상태 업데이트
   useEffect(() => {
@@ -33,35 +27,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  // 알림 모델 변경사항 감지 및 상태 업데이트
-  useEffect(() => {
-    const handleNotificationChange = () => {
-      setState((prevState) => ({
-        ...prevState,
-        notifications: NotificationModel.getNotifications(),
-      }));
-    };
-
-    // 리스너 등록
-    NotificationModel.addListener(handleNotificationChange);
-
-    // 컴포넌트 언마운트 시 리스너 제거
-    return () => {
-      NotificationModel.removeListener(handleNotificationChange);
-    };
-  }, []);
-
   // 앱 초기화
   useEffect(() => {
     const initializeApp = async () => {
       setState((prevState) => ({ ...prevState, isLoading: true, error: null }));
 
       try {
-        // 서비스 워커 등록
-        await notificationController
-          .getNotificationService()
-          .registerServiceWorker();
-
         // 초기 뉴스 로드
         await newsController.initializeNews();
 
@@ -72,7 +43,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
           ...prevState,
           isLoading: false,
           articles: NewsModel.getArticles(),
-          notifications: NotificationModel.getNotifications(),
         }));
       } catch (error) {
         setState((prevState) => ({
@@ -92,7 +62,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return () => {
       newsController.stopAutoRefresh();
     };
-  }, [newsController, notificationController]);
+  }, [newsController]);
 
   // 뉴스 새로고침
   const refreshNews = async () => {
@@ -122,38 +92,39 @@ export function AppProvider({ children }: { children: ReactNode }) {
     newsController.markArticleAsRead(id);
   };
 
-  // 알림 읽음 표시
-  const markNotificationAsRead = (id: string) => {
-    notificationController.markAsRead(id);
-  };
-
-  // 모든 알림 읽음 표시
-  const markAllNotificationsAsRead = () => {
-    notificationController.markAllAsRead();
-  };
-
-  // 설정 업데이트
-  const updateSettings = (newSettings: Partial<FilterSettings>) => {
-    newsController.updateSettings(newSettings);
+  // 추가 뉴스 기사 가져오기
+  const fetchMoreNews = async (offset: number, limit: number) => {
     setState((prevState) => ({
       ...prevState,
-      settings: { ...prevState.settings, ...newSettings },
+      isFetchingMoreNews: true,
+      error: null,
     }));
-  };
-
-  // 알림 클릭 처리
-  const handleNotificationClick = (id: string) => {
-    return notificationController.handleNotificationClick(id);
+    try {
+      const fetchedArticles = await newsController.fetchMoreNews(offset, limit); // 반환값 받기
+      setState((prevState) => ({
+        ...prevState,
+        isFetchingMoreNews: false,
+        articles: NewsModel.getArticles(), // NewsModel에서 업데이트된 기사 가져오기
+      }));
+      return fetchedArticles; // 가져온 기사 반환
+    } catch (error) {
+      setState((prevState) => ({
+        ...prevState,
+        isFetchingMoreNews: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : '알 수 없는 오류가 발생했습니다.',
+      }));
+      return []; // 오류 발생 시 빈 배열 반환
+    }
   };
 
   const contextValue = {
     state,
     refreshNews,
     markArticleAsRead,
-    markNotificationAsRead,
-    markAllNotificationsAsRead,
-    updateSettings,
-    handleNotificationClick,
+    fetchMoreNews, // 새로운 함수 추가
   };
 
   return (

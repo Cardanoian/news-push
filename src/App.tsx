@@ -7,17 +7,15 @@ import {
 } from 'react-router-dom';
 import { AppProvider } from './context/AppProvider';
 import HomePage from './views/pages/HomePage';
-import SettingsPage from './views/pages/SettingsPage';
 import NewsDetailPage from './views/pages/NewsDetailPage';
 
 const App: React.FC = () => {
   return (
-    <div className='min-h-screen bg-gray-400'>
+    <div className='min-h-screen'>
       <AppProvider>
         <Router>
           <Routes>
             <Route path='/' element={<HomePage />} />
-            <Route path='/settings' element={<SettingsPage />} />
             <Route path='/article/:id' element={<NewsDetailPage />} />
             <Route path='*' element={<Navigate to='/' replace />} />
           </Routes>

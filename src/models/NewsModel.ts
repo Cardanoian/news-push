@@ -58,6 +58,7 @@ class NewsModel {
       imageUrl: data.image_url,
       publishedAt: data.published_at,
       isRead: data.is_read,
+      category: data.category,
     };
 
     return article;
@@ -98,6 +99,24 @@ class NewsModel {
   // 리스너 제거
   public removeListener(listener: () => void): void {
     this.listeners = this.listeners.filter((l) => l !== listener);
+  }
+
+  // 새로운 기사들을 추가
+  public addArticles(newArticles: NewsArticle[]): void {
+    const readIds = JSON.parse(localStorage.getItem('readArticles') || '[]');
+    const articlesToAdd = newArticles.map((article) => ({
+      ...article,
+      isRead: readIds.includes(article.id),
+    }));
+
+    // 중복을 피하기 위해 기존 기사 ID를 Set으로 관리
+    const existingArticleIds = new Set(this.articles.map((a) => a.id));
+    const uniqueNewArticles = articlesToAdd.filter(
+      (article) => !existingArticleIds.has(article.id)
+    );
+
+    this.articles = [...this.articles, ...uniqueNewArticles];
+    this.notifyListeners();
   }
 
   // 모든 리스너에게 변경 알림
