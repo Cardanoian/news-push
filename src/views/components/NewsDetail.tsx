@@ -60,11 +60,11 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ article }) => {
                 className='w-full h-64 object-cover'
               />
             ) : (
-              <div className='w-full h-64 object-cover'></div>
+              <div className='w-full h-64 object-cover text-3xl md:text-6xl text-gray-700 flex items-center justify-center'>
+                이미지가 없습니다.
+              </div>
             )}
-            <div className='absolute inset-0 bg-gradient-to-t from-black/30 to-transparent text-3xl md:text-6xl text-gray-700 flex items-center justify-center'>
-              이미지가 없습니다.
-            </div>
+            <div className='absolute inset-0 bg-gradient-to-t from-black/30 to-transparent '></div>
 
             {/* 상단 버튼들 */}
             <div className='absolute top-6 left-6 right-6 flex items-center justify-between'>
