@@ -52,82 +52,41 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ article }) => {
       <div className='max-w-4xl mx-auto px-4 py-8'>
         <div className='bg-white rounded-3xl shadow-2xl overflow-hidden border-0'>
           {/* 이미지 섹션 */}
-          {article.imageUrl && (
-            <div className='relative'>
+          <div className='relative'>
+            {article.imageUrl ? (
               <img
                 src={article.imageUrl}
                 alt={article.title}
                 className='w-full h-64 object-cover'
               />
-              <div className='absolute inset-0 bg-gradient-to-t from-black/30 to-transparent' />
-
-              {/* 상단 버튼들 */}
-              <div className='absolute top-6 left-6 right-6 flex items-center justify-between'>
-                <Button
-                  variant='outline'
-                  size='icon'
-                  onClick={() => navigate(-1)}
-                  className='bg-white/80 backdrop-blur-sm rounded-full border-0 shadow-lg group'
-                >
-                  <ArrowLeft className='h-5 w-5 text-gray-800 group-hover:text-white transition-colors duration-700' />
-                </Button>
-
-                <div className='flex items-center gap-2'>
-                  <Button
-                    variant='outline'
-                    size='icon'
-                    onClick={handleShare}
-                    className='bg-white/80 backdrop-blur-sm rounded-full border-0 shadow-lg group'
-                  >
-                    <Share2 className='h-5 w-5 text-gray-800 group-hover:text-white transition-colors duration-700' />
-                  </Button>
-
-                  <Button
-                    variant='outline'
-                    size='icon'
-                    onClick={() => window.open(article.url, '_blank')}
-                    className='bg-white/80 backdrop-blur-sm rounded-full border-0 shadow-lig group'
-                  >
-                    <ExternalLink className='h-5 w-5 text-gray-800 group-hover:text-white transition-colors duration-700' />
-                  </Button>
-                </div>
-              </div>
+            ) : (
+              <div className='w-full h-64 object-cover'></div>
+            )}
+            <div className='absolute inset-0 bg-gradient-to-t from-black/30 to-transparent text-3xl md:text-6xl text-gray-700 flex items-center justify-center'>
+              이미지가 없습니다.
             </div>
-          )}
 
-          {/* 이미지가 없는 경우의 상단 버튼 */}
-          {!article.imageUrl && (
-            <div className='sticky top-0 bg-white z-10 py-4 px-6 border-b border-gray-100 flex items-center justify-between'>
+            {/* 상단 버튼들 */}
+            <div className='absolute top-6 left-6 right-6 flex items-center justify-between'>
               <Button
                 variant='outline'
                 size='icon'
                 onClick={() => navigate(-1)}
-                className='rounded-full group'
+                className='absolute top-1 left-1 bg-white/80 backdrop-blur-sm rounded-full border-0 shadow-lg group'
               >
-                <ArrowLeft className='h-5 w-5 text-gray-800 group-hover:text-white transition-colors duration-500' />
+                <ArrowLeft className='h-5 w-5 text-gray-800 group-hover:text-white transition-colors duration-700' />
               </Button>
 
-              <div className='flex items-center gap-2'>
-                <Button
-                  variant='outline'
-                  size='icon'
-                  onClick={handleShare}
-                  className='rounded-full group'
-                >
-                  <Share2 className='h-5 w-5 text-gray-800 group-hover:text-white transition-colors duration-500' />
-                </Button>
-
-                <Button
-                  variant='outline'
-                  size='icon'
-                  onClick={() => window.open(article.url, '_blank')}
-                  className='rounded-full group'
-                >
-                  <ExternalLink className='h-5 w-5 text-gray-800 group-hover:text-white transition-colors duration-500' />
-                </Button>
-              </div>
+              <Button
+                variant='outline'
+                size='icon'
+                onClick={handleShare}
+                className='absolute top-1 right-1 bg-white/80 backdrop-blur-sm rounded-full border-0 shadow-lg group'
+              >
+                <Share2 className='h-5 w-5 text-gray-800 group-hover:text-white transition-colors duration-700' />
+              </Button>
             </div>
-          )}
+          </div>
 
           {/* 콘텐츠 섹션 */}
           <div className='p-8 bg-white'>
@@ -157,10 +116,10 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ article }) => {
             {/* 원문 링크 */}
             <div className='pt-6 border-t border-gray-100'>
               <Button
-                className='w-full rounded-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-lg shadow-blue-500/25'
+                className='w-full rounded-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-lg shadow-blue-500/25 text-gray-100'
                 onClick={() => window.open(article.url, '_blank')}
               >
-                <ExternalLink className='h-4 w-4 mr-2' />
+                <ExternalLink className='h-4 w-4 mr-2 text-gray-100' />
                 원문 보기
               </Button>
             </div>
