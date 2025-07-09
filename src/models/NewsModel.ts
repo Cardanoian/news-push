@@ -1,6 +1,5 @@
 import { NewsArticle } from './types';
-import supabase from '../supabase/config';
-import SupabaseService from '../services/SupabaseService';
+import SupabaseService, { supabase } from '../services/SupabaseService';
 
 class NewsModel {
   private articles: NewsArticle[] = [];

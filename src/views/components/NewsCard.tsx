@@ -55,6 +55,9 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, onClick }) => {
             className='w-full h-48 object-cover'
           />
           <div className='absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent' />
+          <Badge className='absolute top-4 left-4 bg-red-100 text-red-800 rounded-full px-3 py-1 ml-2'>
+            {article.category}
+          </Badge>
           {!article.isRead && (
             <Badge className='absolute top-4 right-4 bg-orange-500 text-white hover:bg-orange-600 rounded-full px-3 py-1'>
               새로운 소식
