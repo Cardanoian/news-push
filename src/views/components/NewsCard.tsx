@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAppContext } from '../../context/useAppContext';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Share2 } from 'lucide-react';
 
 interface NewsCardProps {
   article: NewsArticle;
@@ -37,6 +37,25 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, onClick }) => {
       markArticleAsRead(article.id);
     }
     onClick(article.id);
+  };
+
+  // 공유 기능
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: article.title,
+          text: article.content.substring(0, 100) + '...',
+          url: article.url,
+        });
+      } catch (error) {
+        console.error('공유 실패:', error);
+      }
+    } else {
+      // 공유 API를 지원하지 않는 브라우저에서는 URL 복사
+      navigator.clipboard.writeText(article.url);
+      alert('URL이 클립보드에 복사되었습니다.');
+    }
   };
 
   return (
@@ -70,7 +89,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, onClick }) => {
         <div className='flex items-center justify-between mb-2'>
           <Badge
             variant='secondary'
-            className='bg-blue-100 text-blue-800 rounded-full px-3 py-1'
+            className='bg-blue-100 text-blue-500 rounded-full px-3 py-1'
           >
             {article.source}
           </Badge>
@@ -93,21 +112,30 @@ const NewsCard: React.FC<NewsCardProps> = ({ article, onClick }) => {
           <Button
             variant='outline'
             size='sm'
-            className='rounded-full border-gray-200 hover:bg-gray-50'
+            className='rounded-full bg-gradient-to-r from-gray-100 to-gray-300 hover:from-gray-600 hover:to-gray-900 shadow-lg shadow-gray-500/25 transition-colors duration-700 group'
             onClick={(e) => {
               e.stopPropagation();
               window.open(article.url, '_blank');
             }}
           >
-            <ExternalLink className='h-4 w-4 mr-2' />
-            원문 보기
+            <ExternalLink className='h-4 w-4 mr-2 text-gray-800 group-hover:text-white transition-colors duration-700' />
+            <p className='text-gray-800 group-hover:text-white transition-colors duration-700'>
+              원문 보기
+            </p>
           </Button>
 
           <Button
             size='sm'
-            className='rounded-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-lg shadow-blue-500/25'
+            onClick={(e) => {
+              e.stopPropagation();
+              handleShare();
+            }}
+            className='rounded-full bg-gradient-to-r from-blue-300 to-blue-400 hover:from-blue-600 hover:to-blue-900 shadow-lg shadow-blue-500/25 transition-colors duration-700 group'
           >
-            자세히 보기
+            <Share2 className='h-5 w-5 text-gray-800 group-hover:text-white transition-colors duration-700' />
+            <p className='text-gray-800 group-hover:text-white transition-colors duration-700'>
+              공유하기
+            </p>
           </Button>
         </div>
       </CardFooter>
